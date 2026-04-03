@@ -1,0 +1,20 @@
+# Tender Compliance Validator - Requirements
+# Install with: pip install -r requirements.txt
+
+# Core Framework
+flask>=2.3.0
+werkzeug>=2.3.0
+
+# PDF Processing
+PyPDF2>=3.0.0
+
+# NLP and AI
+sentence-transformers>=2.2.0
+scikit-learn>=1.3.0
+numpy>=1.24.0
+spacy>=3.7.0
+# Run after pip install: python -m spacy download en_core_web_sm
+
+# Utilities
+python-magic>=0.4.27
+uuid
