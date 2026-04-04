@@ -11,9 +11,48 @@ import re
 from utils.extractor import RequirementExtractor
 from utils.validator import BidValidator
 
+users = {}  # simple storage
+
 app = Flask(__name__)
 app.secret_key = 'tender-compliance-validator-secret-key'
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
+
+# ================= AUTH ROUTES =================
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username in users:
+            return "User already exists!"
+
+        users[username] = password
+        return redirect(url_for("login"))
+
+    return render_template("register.html")
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        if username in users and users[username] == password:
+            session['user'] = username
+            return redirect(url_for("home"))
+        else:
+            return "Invalid credentials"
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.pop('user', None)
+    return redirect(url_for("login"))
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
@@ -38,11 +77,12 @@ def extract_text_from_pdf(file_stream):
         return text
     except Exception as e:
         return None
-
+    
 @app.route("/")
 def home():
-    """Landing page with upload interface"""
-    return render_template('index.html')
+    if 'user' not in session:
+        return redirect(url_for("login"))
+    return render_template("index.html")
 
 @app.route("/upload-rfp", methods=["POST"])
 def upload_rfp():
