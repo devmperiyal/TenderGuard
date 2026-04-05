@@ -117,18 +117,17 @@ class BidValidator:
         return min(1.0, max(0.0, final_confidence))
     
     def _determine_validation_status(self, match_result: Dict) -> str:
-        """Determine validation status based on match confidence"""
         confidence = match_result['confidence']
         similarity = match_result['similarity']
-        
+    
         if confidence >= self.high_confidence_threshold and similarity > 0.75:
-            return "✅ Fully Addressed"
+            return "Fully Addressed"        # was "✅ Fully Addressed"
         elif confidence >= self.similarity_threshold:
-            return "⚠️ Partially Addressed"
+            return "Partially Addressed"    # was "⚠️ Partially Addressed"
         elif similarity > 0.4:
-            return "❌ Insufficiently Addressed"
+            return "Insufficiently Addressed"  # was "❌ Insufficiently Addressed"
         else:
-            return "❌ Missing"
+            return "Missing"               # was "❌ Missing"
     
     def _keyword_match(self, requirement: str, segments: List[str]) -> Dict:
         """Fallback keyword-based matching"""

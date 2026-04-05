@@ -5,6 +5,9 @@
 flask>=2.3.0
 werkzeug>=2.3.0
 
+# Database
+psycopg2-binary>=2.9.0
+
 # PDF Processing
 PyPDF2>=3.0.0
 
