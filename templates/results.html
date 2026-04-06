@@ -345,7 +345,8 @@
             </h4>
 
             <div class="accordion" id="resultsAccordion">
-                <!-- Fully Addressed -->
+
+                <!-- ✅ Fully Addressed -->
                 {% if by_status['Fully Addressed'] %}
                 <div class="accordion-item">
                     <h2 class="accordion-header">
@@ -366,19 +367,21 @@
                                         <span class="badge bg-dark me-2">{{ req.id }}</span>
                                         <span class="badge bg-info">{{ req.category }}</span>
                                     </div>
-                                    <span class="status-badge status-addressed">✅ Fully Addressed</span>
+                                    <span class="status-badge status-addressed">&#x2705; Fully Addressed</span>
                                 </div>
                                 <p class="mb-2"><strong>Requirement:</strong> {{ req.text }}</p>
+                                {% if req.matched_proposal_text %}
                                 <div class="matched-text mb-2">
                                     <strong><i class="fas fa-quote-left me-2"></i>Matched Text:</strong><br>
                                     {{ req.matched_proposal_text[:300] }}{% if req.matched_proposal_text|length > 300
                                     %}...{% endif %}
                                 </div>
+                                {% endif %}
                                 <div class="d-flex align-items-center">
                                     <small class="text-muted me-2">Match Confidence:</small>
                                     <div class="confidence-meter flex-grow-1 me-2" style="max-width: 200px;">
                                         <div class="confidence-fill confidence-high"
-                                            style="width: {{ req.match_confidence * 100 }}%"></div>
+                                            style="width: {{ (req.match_confidence * 100)|round(1) }}%"></div>
                                     </div>
                                     <span class="fw-bold text-success">{{ "%.1f"|format(req.match_confidence * 100)
                                         }}%</span>
@@ -390,7 +393,7 @@
                 </div>
                 {% endif %}
 
-                <!-- Partially Addressed -->
+                <!-- ⚠️ Partially Addressed -->
                 {% if by_status['Partially Addressed'] %}
                 <div class="accordion-item">
                     <h2 class="accordion-header">
@@ -410,19 +413,22 @@
                                         <span class="badge bg-dark me-2">{{ req.id }}</span>
                                         <span class="badge bg-info">{{ req.category }}</span>
                                     </div>
-                                    <span class="status-badge status-partial">⚠️ Partially Addressed</span>
+                                    <span class="status-badge status-partial">&#x26A0;&#xFE0F; Partially
+                                        Addressed</span>
                                 </div>
                                 <p class="mb-2"><strong>Requirement:</strong> {{ req.text }}</p>
+                                {% if req.matched_proposal_text %}
                                 <div class="matched-text mb-2">
                                     <strong><i class="fas fa-quote-left me-2"></i>Matched Text:</strong><br>
                                     {{ req.matched_proposal_text[:300] }}{% if req.matched_proposal_text|length > 300
                                     %}...{% endif %}
                                 </div>
+                                {% endif %}
                                 <div class="d-flex align-items-center mb-2">
                                     <small class="text-muted me-2">Match Confidence:</small>
                                     <div class="confidence-meter flex-grow-1 me-2" style="max-width: 200px;">
                                         <div class="confidence-fill confidence-medium"
-                                            style="width: {{ req.match_confidence * 100 }}%"></div>
+                                            style="width: {{ (req.match_confidence * 100)|round(1) }}%"></div>
                                     </div>
                                     <span class="fw-bold text-warning">{{ "%.1f"|format(req.match_confidence * 100)
                                         }}%</span>
@@ -441,7 +447,7 @@
                 </div>
                 {% endif %}
 
-                <!-- Missing/Insufficient -->
+                <!-- ❌ Missing / Insufficiently Addressed -->
                 {% if by_status['Missing/Insufficient'] %}
                 <div class="accordion-item">
                     <h2 class="accordion-header">
@@ -461,7 +467,12 @@
                                         <span class="badge bg-dark me-2">{{ req.id }}</span>
                                         <span class="badge bg-info">{{ req.category }}</span>
                                     </div>
-                                    <span class="status-badge status-missing">❌ {{ req.validation_status }}</span>
+                                    <!-- Display label based on plain-text status value -->
+                                    {% if req.validation_status == 'Missing' %}
+                                    <span class="status-badge status-missing">&#x274C; Missing</span>
+                                    {% else %}
+                                    <span class="status-badge status-missing">&#x274C; Insufficiently Addressed</span>
+                                    {% endif %}
                                 </div>
                                 <p class="mb-2"><strong>Requirement:</strong> {{ req.text }}</p>
                                 {% if req.matched_proposal_text and req.matched_proposal_text != "No match found" %}
@@ -479,7 +490,7 @@
                                     <small class="text-muted me-2">Match Confidence:</small>
                                     <div class="confidence-meter flex-grow-1 me-2" style="max-width: 200px;">
                                         <div class="confidence-fill confidence-low"
-                                            style="width: {{ req.match_confidence * 100 }}%"></div>
+                                            style="width: {{ (req.match_confidence * 100)|round(1) }}%"></div>
                                     </div>
                                     <span class="fw-bold text-danger">{{ "%.1f"|format(req.match_confidence * 100)
                                         }}%</span>
@@ -490,6 +501,37 @@
                     </div>
                 </div>
                 {% endif %}
+
+                <!-- Not Checked -->
+                {% if by_status['Not Checked'] %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseNotChecked">
+                            <span class="risk-indicator" style="background:#6c757d;"></span>
+                            <strong>Not Checked</strong>
+                            <span class="badge bg-secondary ms-2">{{ by_status['Not Checked']|length }}</span>
+                        </button>
+                    </h2>
+                    <div id="collapseNotChecked" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
+                        <div class="accordion-body">
+                            {% for req in by_status['Not Checked'] %}
+                            <div class="requirement-card card-unchecked p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <span class="badge bg-dark me-2">{{ req.id }}</span>
+                                        <span class="badge bg-info">{{ req.category }}</span>
+                                    </div>
+                                    <span class="status-badge status-unchecked">&#x2753; Not Checked</span>
+                                </div>
+                                <p class="mb-0"><strong>Requirement:</strong> {{ req.text }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
             </div>
 
             <!-- Recommendations -->
@@ -551,7 +593,6 @@
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
 
-                // Show success toast
                 const toast = document.createElement('div');
                 toast.className = 'alert alert-success position-fixed top-0 end-0 m-3';
                 toast.style.zIndex = '1050';

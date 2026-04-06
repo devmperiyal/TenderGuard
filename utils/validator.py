@@ -33,8 +33,9 @@ class BidValidator:
             match_result = self._find_best_match(req['text'], proposal_segments)
             
             req['matched_proposal_text'] = match_result['matched_text']
-            req['match_confidence'] = match_result['confidence']
-            req['similarity_score'] = match_result['similarity']
+            # Convert numpy floats to Python floats for database compatibility
+            req['match_confidence'] = float(match_result['confidence'])
+            req['similarity_score'] = float(match_result['similarity'])
             req['validation_status'] = self._determine_validation_status(match_result)
             req['alternative_matches'] = match_result.get('alternatives', [])
             
@@ -97,7 +98,7 @@ class BidValidator:
     
     def _calculate_confidence(self, similarity: float, req_text: str, matched_text: str) -> float:
         """Calculate confidence score based on multiple factors"""
-        base_confidence = similarity
+        base_confidence = float(similarity)
         
         # Boost confidence for high similarity
         if similarity > self.high_confidence_threshold:
@@ -114,20 +115,20 @@ class BidValidator:
         vague_penalty = sum(1 for word in vague_words if word in matched_lower) * 0.03
         
         final_confidence = base_confidence + commitment_score - vague_penalty
-        return min(1.0, max(0.0, final_confidence))
+        return float(min(1.0, max(0.0, final_confidence)))
     
     def _determine_validation_status(self, match_result: Dict) -> str:
         confidence = match_result['confidence']
         similarity = match_result['similarity']
-    
+
         if confidence >= self.high_confidence_threshold and similarity > 0.75:
-            return "Fully Addressed"        # was "✅ Fully Addressed"
+            return "Fully Addressed"
         elif confidence >= self.similarity_threshold:
-            return "Partially Addressed"    # was "⚠️ Partially Addressed"
+            return "Partially Addressed"
         elif similarity > 0.4:
-            return "Insufficiently Addressed"  # was "❌ Insufficiently Addressed"
+            return "Insufficiently Addressed"
         else:
-            return "Missing"               # was "❌ Missing"
+            return "Missing"
     
     def _keyword_match(self, requirement: str, segments: List[str]) -> Dict:
         """Fallback keyword-based matching"""

@@ -25,7 +25,9 @@ DB_CONFIG = {
 
 def get_db_connection():
     """Create and return a PostgreSQL connection"""
-    return psycopg2.connect(**DB_CONFIG)
+    conn = psycopg2.connect(**DB_CONFIG)
+    conn.set_client_encoding('UTF8')
+    return conn
 
 
 def init_db():
@@ -541,20 +543,29 @@ def upload_proposal():
         if not proposal_text:
             return jsonify({'error': 'Could not extract text from proposal PDF'}), 400
 
+        print(f"[DEBUG] Proposal text extracted: {len(proposal_text)} chars")
+        print(f"[DEBUG] Requirements to validate: {len(requirements)}")
+        
         # Validate proposal
+        print(f"[DEBUG] Starting validation...")
         validated_requirements = validator.validate_proposal(requirements, proposal_text)
+        print(f"[DEBUG] Validation complete. First req status: {validated_requirements[0]['validation_status']}")
 
         # Update project with proposal data
         update_project(session['project_id'], secure_filename(file.filename), proposal_text)
+        print(f"[DEBUG] Project updated")
         
         # Save validated requirements to database
         save_requirements(session['project_id'], validated_requirements)
+        print(f"[DEBUG] Requirements saved to DB")
 
         # Calculate summary
         total = len(validated_requirements)
-        addressed = sum(1 for r in validated_requirements if 'Fully' in r['validation_status'])
-        partial = sum(1 for r in validated_requirements if 'Partially' in r['validation_status'])
-        missing = sum(1 for r in validated_requirements if 'Missing' in r['validation_status'] or 'Insufficient' in r['validation_status'])
+        addressed = sum(1 for r in validated_requirements if r['validation_status'] == 'Fully Addressed')
+        partial = sum(1 for r in validated_requirements if r['validation_status'] == 'Partially Addressed')
+        missing = sum(1 for r in validated_requirements if r['validation_status'] in ('Missing', 'Insufficiently Addressed'))
+
+        print(f"[DEBUG] Summary - Total: {total}, Addressed: {addressed}, Partial: {partial}, Missing: {missing}")
 
         return jsonify({
             'success': True,
@@ -569,6 +580,9 @@ def upload_proposal():
         })
 
     except Exception as e:
+        print(f"[ERROR] Exception in upload_proposal: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 @app.route("/results")
@@ -585,9 +599,9 @@ def results():
     
     # Calculate statistics
     total = len(requirements)
-    addressed = sum(1 for r in requirements if 'Fully' in r['validation_status'])
-    partial = sum(1 for r in requirements if 'Partially' in r['validation_status'])
-    missing = sum(1 for r in requirements if 'Missing' in r['validation_status'] or 'Insufficient' in r['validation_status'])
+    addressed = sum(1 for r in requirements if r['validation_status'] == 'Fully Addressed')
+    partial = sum(1 for r in requirements if r['validation_status'] == 'Partially Addressed')
+    missing = sum(1 for r in requirements if r['validation_status'] in ('Missing', 'Insufficiently Addressed'))
     not_checked = sum(1 for r in requirements if r['validation_status'] == 'Not Checked')
     
     # Group by status for display
