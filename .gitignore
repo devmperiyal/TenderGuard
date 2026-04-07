@@ -1,0 +1,45 @@
+# ── Python ──────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+
+# ── Virtual Environment ──────────────────────────────
+venv/
+env/
+.env/
+.venv/
+
+# ── Environment Variables ────────────────────────────
+.env
+*.env
+
+# ── Database ─────────────────────────────────────────
+*.sql.bak
+*.db
+*.sqlite3
+
+# ── Uploads (user-uploaded PDFs) ─────────────────────
+uploads/
+
+# ── IDE / Editor ─────────────────────────────────────
+.vscode/
+.idea/
+*.code-workspace
+
+# ── OS Files ─────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Flask ────────────────────────────────────────────
+instance/
+*.log
+
+# ── Test / Debug files ───────────────────────────────
+test_validation.py
+
+# ── Sentence Transformers model cache ────────────────
+.cache/
