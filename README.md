@@ -147,7 +147,7 @@ Open your browser at: **http://127.0.0.1:5000**
 | ❌ Insufficiently Addressed | 0.00 | Mentioned but response too weak to confirm compliance |
 | ❌ Missing | 0.00 | No matching content found in proposal |
 
-**Score = (Fully Addressed + 0.5 × Partially Addressed + Missing or Insufficiently Addressed × 0) ÷ Total Requirements × 100**
+**Compliance Score = (Fully Addressed + 0.5 × Partially Addressed + Missing or Insufficiently Addressed × 0) ÷ Total Requirements × 100**
 
 ---
 

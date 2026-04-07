@@ -40,7 +40,7 @@ Legal and procurement teams must manually verify every mandatory requirement in 
 | Insufficiently Addressed | Similarity &gt; 0.40 | 0.00 | Mentioned, too weak |
 | Missing | Similarity &lt;= 0.40 | 0.00 | Not found in proposal |
 
-**Score = (Fully Addressed + 0.5 × Partially Addressed + Missing or Insufficiently Addressed × 0) ÷ Total × 100**
+**Compliance Score = (Fully Addressed + 0.5 × Partially Addressed + Missing or Insufficiently Addressed × 0) ÷ Total × 100**
 
 ---
 
